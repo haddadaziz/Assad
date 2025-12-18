@@ -218,9 +218,7 @@ $users_list = [
             <div class="bg-white rounded-xl shadow-md p-6">
                 <div class="mb-4 flex justify-between items-center">
                     <h3 class="font-bold text-lg">Gestion des comptes</h3>
-                    <input type="text" placeholder="Rechercher un email..." class="border p-2 rounded text-sm w-64">
                 </div>
-
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="bg-gray-100 text-gray-600 uppercase text-xs">
