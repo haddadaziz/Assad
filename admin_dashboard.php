@@ -2,7 +2,6 @@
 session_start();
 require_once 'config.php';
 
-$message = "";
 if (isset($_GET['action']) && isset($_GET['id'])) {
     $id_user = $_GET['id'];
     $action = $_GET['action'];
@@ -10,13 +9,35 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
     if ($action == 'valider') {
         $stmt = $pdo->prepare("UPDATE utilisateurs SET statut = 1 WHERE id_utilisateur = ?");
         $stmt->execute([$id_user]);
-        $message = "<div class='bg-green-100 text-green-700 p-3 rounded mb-4'>✅ Le compte a été validé !</div>";
+        header("Location: ?section=habitats&status=success_compte_valider");
     }
 
     if ($action == 'bannir') {
         $stmt = $pdo->prepare("UPDATE utilisateurs SET statut = 0 WHERE id_utilisateur = ?");
         $stmt->execute([$id_user]);
-        $message = "<div class='bg-red-100 text-red-700 p-3 rounded mb-4'>🚫 Le compte a été bloqué.</div>";
+        header("Location: ?section=habitats&status=success_block_user");
+    }
+}
+
+if (isset($_POST['creer_habitat'])) {
+    $nom = trim($_POST['nom']);
+    $typeclimat = trim($_POST['typeclimat']);
+    $zonezoo = $_POST['zonezoo'];
+    $description = $_POST['description'];
+    $sql_verif = "SELECT COUNT(*) FROM habitats WHERE LOWER(nom) = LOWER(?)";
+    $stmt_verif = $pdo->prepare($sql_verif);
+    $stmt_verif->execute([$nom]);
+    $count = $stmt_verif->fetchColumn();
+
+    if ($count > 0) {
+        header("Location: ?section=habitats&status=error_habitat_exists");
+        exit();
+    } else {
+        $sql = "INSERT INTO habitats (nom, typeclimat, description, zonezoo) VALUES (?, ?, ?, ?)";
+        $stmt = $pdo->prepare($sql);
+        if ($stmt->execute([$nom, $typeclimat, $description, $zonezoo])) {
+            header("Location: ?section=habitats&status=success_ajout_habitat");
+        }
     }
 }
 
@@ -37,6 +58,8 @@ $stats = [
 
 $sql = "SELECT * FROM utilisateurs";
 $users_list = $pdo->query($sql);
+$habitats_list = $pdo->query("SELECT * FROM habitats")->fetchAll();
+$animaux_list = $pdo->query("SELECT * FROM animaux")->fetchAll();
 
 ?>
 
@@ -50,6 +73,7 @@ $users_list = $pdo->query($sql);
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="script.js" defer></script>
     <script>
         tailwind.config = {
             theme: {
@@ -146,7 +170,6 @@ $users_list = $pdo->query($sql);
                 <i class="fa-solid fa-eye"></i> Voir le site
             </a>
         </header>
-
         <?php if ($section == 'dashboard'): ?>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <div
@@ -196,7 +219,7 @@ $users_list = $pdo->query($sql);
                 <div class="mb-8 p-6 bg-gray-50 rounded-lg border border-gray-200">
                     <h3 class="font-bold text-lg mb-4 text-maroc-green"><i class="fa-solid fa-plus-circle mr-2"></i>Ajouter
                         un nouvel animal</h3>
-                    <form action="" method="POST" enctype="multipart/form-data"
+                    <form action="?section=animaux" method="POST" enctype="multipart/form-data"
                         class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <input type="text" placeholder="Nom (ex: Simba)" class="border p-2 rounded w-full">
                         <input type="text" placeholder="Espèce (ex: Lion)" class="border p-2 rounded w-full">
@@ -223,71 +246,98 @@ $users_list = $pdo->query($sql);
                             <th class="p-4">Nom</th>
                             <th class="p-4">Espèce</th>
                             <th class="p-4">Habitat</th>
+                            <th class="p-4">Description</th>
                             <th class="p-4 text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="border-b hover:bg-gray-50">
-                            <td class="p-4">
-                                <div class="w-12 h-12 bg-gray-200 rounded-full"></div>
-                            </td>
-                            <td class="p-4 font-bold">Asaad</td>
-                            <td class="p-4">Lion de l'Atlas</td>
-                            <td class="p-4"><span
-                                    class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Montagnes</span></td>
-                            <td class="p-4 text-right space-x-2">
-                                <button class="text-blue-500 hover:text-blue-700"><i class="fa-solid fa-pen"></i></button>
-                                <button class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
-                            </td>
-                        </tr>
+                        <?php
+                        if (isset($animaux_list)) {
+                            foreach ($animaux_list as $a): ?>
+                                <tr class="border-b hover:bg-gray-50">
+                                    <td class="p-4">
+                                        <div class="w-12 h-12 bg-gray-200 rounded-full"></div>
+                                    </td>
+                                    <td class="p-4 font-bold"><?= $a['nom'] ?></td>
+                                    <td class="p-4"><?= $a['espèce'] ?></td>
+                                    <td class="p-4"><span
+                                            class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Montagnes</span></td>
+                                    <td class="p-4 text-right space-x-2">
+                                    <td class="p-4">
+                                        <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded"><?= $a['descriptioncourte']?></span>
+                                    </td>
+                                        <button class="text-blue-500 hover:text-blue-700"><i class="fa-solid fa-pen"></i></button>
+                                        <button class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                            <?php endforeach;
+                        } ?>
                     </tbody>
                 </table>
             </div>
 
-            <!-- habitats (id, nom, typeclimat, description, zonezoo) -->
         <?php elseif ($section == 'habitats'): ?>
             <div class="bg-white rounded-xl shadow-md p-6">
                 <div class="mb-8 p-6 bg-gray-50 rounded-lg border border-gray-200">
                     <h3 class="font-bold text-lg mb-4 text-maroc-green"><i class="fa-solid fa-plus-circle mr-2"></i>Ajouter
                         un nouvel habitat</h3>
-                    <form action="" method="POST" enctype="multipart/form-data"
+                    <form action="?section=habitats" method="POST" enctype="multipart/form-data"
                         class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input type="text" placeholder="Nom (ex : Savane)" class="border p-2 rounded w-full">
-                        <input type="text" placeholder="Type de Climat (ex : humide)" class="border p-2 rounded w-full">
-                        <input type="text" placeholder="Description" class="border p-2 rounded w-full">
-                        <input type="text" placeholder="Zone de l'habitat dans le zoo" class="border p-2 rounded w-full">
+                        <input type="text" placeholder="Nom (ex : Savane)" class="border p-2 rounded w-full" name="nom">
+                        <input type="text" placeholder="Type de Climat (ex : humide)" class="border p-2 rounded w-full"
+                            name="typeclimat">
+                        <input type="text" placeholder="Zone de l'habitat dans le zoo" class="border p-2 rounded w-full"
+                            name="zonezoo">
                         <div class="md:col-span-2">
-                            <textarea placeholder="Description courte..." class="border p-2 rounded w-full"></textarea>
+                            <textarea placeholder="Description courte..." class="border p-2 rounded w-full"
+                                name="description"></textarea>
                         </div>
-                        <button
-                            class="bg-maroc-green text-white py-2 px-6 rounded font-bold hover:bg-green-800 transition">Enregistrer</button>
+                        <button class="bg-maroc-green text-white py-2 px-6 rounded font-bold hover:bg-green-800 transition"
+                            name="creer_habitat">Enregistrer</button>
                     </form>
                 </div>
 
-                <table class="w-full text-left border-collapse">
+                <table class="w-full text-left border-collapse mt-8">
                     <thead>
                         <tr class="bg-gray-100 text-gray-600 uppercase text-xs">
-                            <th class="p-4">Image</th>
                             <th class="p-4">Nom</th>
-                            <th class="p-4">Espèce</th>
-                            <th class="p-4">Habitat</th>
+                            <th class="p-4">Type Climat</th>
+                            <th class="p-4">Description</th>
+                            <th class="p-4">Zone</th>
                             <th class="p-4 text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="border-b hover:bg-gray-50">
-                            <td class="p-4">
-                                <div class="w-12 h-12 bg-gray-200 rounded-full"></div>
-                            </td>
-                            <td class="p-4 font-bold">Asaad</td>
-                            <td class="p-4">Lion de l'Atlas</td>
-                            <td class="p-4"><span
-                                    class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Montagnes</span></td>
-                            <td class="p-4 text-right space-x-2">
-                                <button class="text-blue-500 hover:text-blue-700"><i class="fa-solid fa-pen"></i></button>
-                                <button class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
-                            </td>
-                        </tr>
+                        <?php
+                        if (isset($habitats_list)) {
+                            foreach ($habitats_list as $h): ?>
+                                <tr class="border-b hover:bg-gray-50">
+                                    <td class="p-4 font-bold"><?= $h['nom'] ?></td>
+                                    <td class="p-4 text-gray-600">
+                                        <?= $h['typeclimat'] ?>
+                                    </td>
+                                    <td class="p-4 text-sm text-gray-600 max-w-xs" title="<?= $h['description'] ?>">
+                                        <?php
+                                        if (strlen($h['description']) > 50) {
+                                            echo substr($h['description'], 0, 50) . '...';
+                                        } else {
+                                            echo $h['description'];
+                                        }
+                                        ?>
+                                    </td>
+
+                                    <td class="p-4">
+                                        <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                                            <?= $h['zonezoo'] ?>
+                                        </span>
+                                    </td>
+                                    <td class="p-4 text-right space-x-2">
+                                        <button class="text-blue-500 hover:text-blue-700"><i class="fa-solid fa-pen"></i></button>
+                                        <button class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                            <?php endforeach;
+                        } ?>
                     </tbody>
                 </table>
             </div>
@@ -360,19 +410,13 @@ $users_list = $pdo->query($sql);
                     </tbody>
                 </table>
             </div>
-
-
-        <?php elseif ($section == 'habitats'): ?>
-            <div class="bg-white rounded-xl shadow-md p-6 text-center py-20">
-                <i class="fa-solid fa-mountain-sun text-6xl text-gray-200 mb-4"></i>
-                <h3 class="text-xl font-bold text-gray-400">Section Habitats</h3>
-                <p class="text-gray-500">Même logique que pour les animaux : Tableau + Formulaire.</p>
-            </div>
-
         <?php endif; ?>
-
     </main>
-
+    <!-- Notifications d'erreur ou de succes -->
+    <div class="notification success hidden fixed top-6 left-1/2 transform -translate-x-1/2 z-[999] bg-green-500 text-white px-10 py-4 rounded-full shadow-2xl border-4 border-white/30 text-lg font-bold text-center min-w-[350px] shadow-green-500/50"
+        id="success_notification"></div>
+    <div class="notification error hidden fixed top-6 left-1/2 transform -translate-x-1/2 z-[999] bg-red-500 text-white px-10 py-4 rounded-full shadow-2xl border-4 border-white/30 text-lg font-bold text-center min-w-[350px] shadow-green-500/50"
+        id="error_notification"></div>
 </body>
 
 </html>

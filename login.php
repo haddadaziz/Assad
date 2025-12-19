@@ -3,16 +3,9 @@ session_start();
 require_once 'config.php';
 
 $message = "";
-if (isset($_GET['success'])) {
-    $message = "<div class='bg-green-100 text-green-700 px-4 py-3 rounded mb-4'>Compte créé ! Connectez-vous.</div>";
-}
-
-if (isset($_GET['pending'])) {
-    $message = "<div class='bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-3 rounded mb-4'>⏳ Compte créé avec succès !<br><strong>Note :</strong> En tant que Guide, votre compte doit être validé par un administrateur avant de pouvoir vous connecter.</div>";
-}
 
 if (isset($_GET['redirect'])) {
-    $message = "<div class='bg-yellow-100 text-yellow-800 px-4 py-3 rounded mb-4'>Veuillez vous connecter pour accéder à cette page.</div>";
+    header("Location: login.php?status=must_be_connected");
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -25,19 +18,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($user && password_verify($password, $user['motpasse_hash'])) {
         if ($user['statut'] == 0) {
-            $message = "<div class='bg-yellow-100 text-yellow-800 px-4 py-3 rounded mb-4'>Votre compte est en attente de validation par un administrateur.</div>";
+            header("Location: login.php?status=pending_registration");
         } else {
-            // Remplir la session si login réussi
             $_SESSION['user_id'] = $user['id_utilisateur'];
             $_SESSION['nom'] = $user['nom'];
             $_SESSION['role'] = $user['role'];
 
             if ($user['role'] === 'admin') {
-                header("Location: admin_dashboard.php");
+                header("Location: admin_dashboard.php?status=success_login");
             } elseif ($user['role'] === 'guide') {
-                header("Location: guide_dashboard.php");
+                header("Location: guide_dashboard.php?status=success_login");
             } else {
-                header(header: "Location: visiteur.php");
+                header("Location: visiteur.php?status=success_login");
             }
             exit();
         }
@@ -54,6 +46,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <title>Connexion - Zoo Assad</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="script.js" defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <script>
         tailwind.config = { theme: { extend: { colors: { 'maroc-red': '#C1272D', 'maroc-green': '#006233' } } } }
@@ -101,6 +94,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </p>
         </div>
     </div>
+    <!-- Notifications d'erreur ou de succes -->
+    <div class="notification success hidden fixed top-6 left-1/2 transform -translate-x-1/2 z-[999] bg-green-500 text-white px-10 py-4 rounded-full shadow-2xl border-4 border-white/30 text-lg font-bold text-center min-w-[350px] shadow-green-500/50"
+        id="success_notification"></div>
+    <div class="notification error hidden fixed top-6 left-1/2 transform -translate-x-1/2 z-[999] bg-red-500 text-white px-10 py-4 rounded-full shadow-2xl border-4 border-white/30 text-lg font-bold text-center min-w-[350px] shadow-green-500/50"
+        id="error_notification"></div>
 </body>
 
 </html>

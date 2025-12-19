@@ -58,14 +58,18 @@ $historique = $stmt_hist->fetchAll();
 
 <!DOCTYPE html>
 <html lang="fr" class="scroll-smooth">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Espace Visiteur - Zoo ASSAD</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <script src="script.js" defer></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&family=Open+Sans:wght@400;600&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <script>
         tailwind.config = {
             theme: {
@@ -89,6 +93,7 @@ $historique = $stmt_hist->fetchAll();
         }
     </style>
 </head>
+
 <body class="font-body bg-sand-light text-gray-800 flex flex-col min-h-screen">
 
     <?= $message ?>
@@ -112,8 +117,10 @@ $historique = $stmt_hist->fetchAll();
             </div>
 
             <div class="hidden md:flex items-center space-x-4">
-                <span class="text-yellow-200 font-medium text-sm">Bonjour, <?= htmlspecialchars($_SESSION['nom']) ?></span>
-                <a href="logout.php" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-full font-bold text-sm transition border border-white/50">
+                <span class="text-yellow-200 font-medium text-sm">Bonjour,
+                    <?= htmlspecialchars($_SESSION['nom']) ?></span>
+                <a href="logout.php"
+                    class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-full font-bold text-sm transition border border-white/50">
                     <i class="fa-solid fa-right-from-bracket mr-2"></i>Déconnexion
                 </a>
             </div>
@@ -126,24 +133,28 @@ $historique = $stmt_hist->fetchAll();
 
     <header id="accueil" class="relative h-screen flex items-center justify-center overflow-hidden">
         <div class="absolute inset-0 z-0">
-            <img src="https://images.unsplash.com/photo-1546182990-dffeafbe841d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80" alt="Lion Atlas" class="w-full h-full object-cover">
+            <img src="https://images.unsplash.com/photo-1546182990-dffeafbe841d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
+                alt="Lion Atlas" class="w-full h-full object-cover">
             <div class="absolute inset-0 bg-gradient-to-r from-maroc-red/80 to-black/50"></div>
         </div>
 
         <div class="container mx-auto px-6 relative z-10 grid md:grid-cols-2 gap-12 items-center pt-20">
             <div class="text-white space-y-6">
-                <div class="inline-flex items-center gap-2 bg-yellow-500 text-maroc-red font-bold px-4 py-1 rounded-full text-sm mb-2 shadow-lg animate-pulse">
+                <div
+                    class="inline-flex items-center gap-2 bg-yellow-500 text-maroc-red font-bold px-4 py-1 rounded-full text-sm mb-2 shadow-lg animate-pulse">
                     <i class="fa-solid fa-user-check"></i> MEMBRE CONNECTÉ
                 </div>
                 <h1 class="font-headings text-5xl md:text-7xl font-extrabold leading-tight drop-shadow-lg">
                     Bienvenue sur<br>
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-200">votre espace</span>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-200">votre
+                        espace</span>
                 </h1>
                 <p class="text-lg md:text-xl text-gray-100 max-w-lg leading-relaxed">
                     Ravi de vous revoir. Réservez vos prochaines aventures ou partagez vos souvenirs avec nous.
                 </p>
                 <div class="flex flex-col sm:flex-row gap-4 pt-4">
-                    <a href="#visites" class="bg-maroc-green hover:bg-green-800 text-white text-center px-8 py-4 rounded-lg font-bold text-lg shadow-lg transition transform hover:-translate-y-1">
+                    <a href="#visites"
+                        class="bg-maroc-green hover:bg-green-800 text-white text-center px-8 py-4 rounded-lg font-bold text-lg shadow-lg transition transform hover:-translate-y-1">
                         Réserver une visite
                     </a>
                 </div>
@@ -153,10 +164,13 @@ $historique = $stmt_hist->fetchAll();
 
     <section id="asaad" class="py-20 bg-pattern">
         <div class="container mx-auto px-6">
-            <div class="bg-white rounded-3xl shadow-xl overflow-hidden border-t-4 border-maroc-red flex flex-col md:flex-row">
+            <div
+                class="bg-white rounded-3xl shadow-xl overflow-hidden border-t-4 border-maroc-red flex flex-col md:flex-row">
                 <div class="md:w-1/2 relative h-96 md:h-auto">
-                    <img src="https://images.unsplash.com/photo-1614027164847-1b28cfe1df60?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Lion Majestic" class="w-full h-full object-cover">
-                    <div class="absolute bottom-0 left-0 bg-maroc-green text-white px-6 py-2 rounded-tr-xl font-bold z-10">
+                    <img src="https://images.unsplash.com/photo-1614027164847-1b28cfe1df60?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                        alt="Lion Majestic" class="w-full h-full object-cover">
+                    <div
+                        class="absolute bottom-0 left-0 bg-maroc-green text-white px-6 py-2 rounded-tr-xl font-bold z-10">
                         #DimaMaghrib
                     </div>
                 </div>
@@ -164,7 +178,8 @@ $historique = $stmt_hist->fetchAll();
                     <h2 class="font-headings text-4xl font-bold text-maroc-red">Asaad : Lion de l'Atlas</h2>
                     <h3 class="text-xl font-semibold text-maroc-green">Symbole de la CAN 2025</h3>
                     <p class="text-gray-600 leading-relaxed">
-                        Le Lion de l'Atlas est plus qu'un animal, c'est l'emblème de notre nation. Asaad vous accueille pour vous faire découvrir les secrets de son espèce.
+                        Le Lion de l'Atlas est plus qu'un animal, c'est l'emblème de notre nation. Asaad vous accueille
+                        pour vous faire découvrir les secrets de son espèce.
                     </p>
                 </div>
             </div>
@@ -181,16 +196,18 @@ $historique = $stmt_hist->fetchAll();
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
                 <div class="group bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
                     <div class="h-64 overflow-hidden relative">
-                        <img src="https://images.unsplash.com/photo-1547721064-da6cfb341d50?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Lion" class="w-full h-full object-cover">
+                        <img src="https://images.unsplash.com/photo-1547721064-da6cfb341d50?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
+                            alt="Lion" class="w-full h-full object-cover">
                     </div>
                     <div class="p-6">
                         <h3 class="font-headings font-bold text-xl text-gray-800 mb-1">Lion de l'Atlas</h3>
                         <p class="text-xs font-bold text-maroc-green uppercase tracking-wide">Montagnes</p>
                     </div>
                 </div>
-                </div>
+            </div>
             <div class="text-center">
-                <a href="animaux.php" class="inline-flex items-center justify-center gap-3 bg-white border-2 border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white font-bold py-4 px-10 rounded-full transition duration-300 text-lg shadow-lg group">
+                <a href="animaux.php"
+                    class="inline-flex items-center justify-center gap-3 bg-white border-2 border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white font-bold py-4 px-10 rounded-full transition duration-300 text-lg shadow-lg group">
                     <i class="fa-solid fa-paw group-hover:rotate-12 transition"></i> Explorer la collection
                 </a>
             </div>
@@ -199,58 +216,70 @@ $historique = $stmt_hist->fetchAll();
 
     <section id="visites" class="py-20 bg-gray-50 relative">
         <div class="absolute top-0 left-0 w-full h-20 bg-gradient-to-b from-white to-gray-50"></div>
-        
+
         <div class="container mx-auto px-6 relative z-10">
             <div class="text-center mb-10">
                 <span class="text-maroc-red font-bold tracking-widest uppercase text-sm">Agenda CAN 2025</span>
                 <h2 class="font-headings text-4xl font-extrabold text-gray-900 mt-2">Réserver une visite</h2>
             </div>
 
-            <div class="max-w-4xl mx-auto bg-white p-2 rounded-full shadow-xl border border-gray-200 mb-16 transform -translate-y-4">
+            <div
+                class="max-w-4xl mx-auto bg-white p-2 rounded-full shadow-xl border border-gray-200 mb-16 transform -translate-y-4">
                 <div class="flex flex-col md:flex-row items-center p-2 gap-2">
                     <div class="flex-grow w-full md:w-auto flex items-center px-4">
                         <i class="fa-solid fa-magnifying-glass text-gray-400 mr-3"></i>
-                        <input type="text" placeholder="Rechercher une visite..." class="w-full bg-transparent border-none focus:ring-0 text-gray-700">
+                        <input type="text" placeholder="Rechercher une visite..."
+                            class="w-full bg-transparent border-none focus:ring-0 text-gray-700">
                     </div>
                     <button class="bg-maroc-red text-white font-bold py-3 px-8 rounded-full">Rechercher</button>
                 </div>
             </div>
 
             <div class="grid md:grid-cols-3 gap-8">
-                <?php if(empty($visites_futures)): ?>
+                <?php if (empty($visites_futures)): ?>
                     <div class="col-span-3 text-center text-gray-500 italic py-10">
                         Aucune visite disponible pour le moment.
                     </div>
                 <?php else: ?>
-                    <?php foreach($visites_futures as $v): ?>
-                        <div class="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden flex flex-col h-full hover:shadow-xl transition duration-300 group">
+                    <?php foreach ($visites_futures as $v): ?>
+                        <div
+                            class="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden flex flex-col h-full hover:shadow-xl transition duration-300 group">
                             <div class="relative h-48 overflow-hidden bg-gray-200">
-                                <img src="https://images.unsplash.com/photo-1596716766417-76813296c00e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Visite" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
-                                <div class="absolute top-4 right-4 bg-maroc-green text-white font-bold px-3 py-1 rounded-md text-sm shadow-sm">
+                                <img src="https://images.unsplash.com/photo-1596716766417-76813296c00e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                                    alt="Visite"
+                                    class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
+                                <div
+                                    class="absolute top-4 right-4 bg-maroc-green text-white font-bold px-3 py-1 rounded-md text-sm shadow-sm">
                                     <?= $v['prix'] ?> MAD
                                 </div>
                             </div>
-                            
+
                             <div class="p-6 flex flex-col flex-grow">
                                 <div class="flex justify-between items-start mb-2">
                                     <span class="text-maroc-red font-bold text-xs uppercase tracking-wide">Visite Guidée</span>
-                                    <span class="text-gray-400 text-xs"><i class="fa-solid fa-calendar mr-1"></i> <?= date('d/m/Y H:i', strtotime($v['dateheure'])) ?></span>
+                                    <span class="text-gray-400 text-xs"><i class="fa-solid fa-calendar mr-1"></i>
+                                        <?= date('d/m/Y H:i', strtotime($v['dateheure'])) ?></span>
                                 </div>
                                 <h3 class="font-headings font-bold text-xl mb-2 text-gray-800"><?= $v['titre'] ?></h3>
                                 <div class="text-gray-500 text-sm mb-4 flex-grow">
                                     <p><i class="fa-regular fa-clock mr-2"></i>Durée : <?= $v['duree'] ?> min</p>
                                     <p><i class="fa-solid fa-language mr-2"></i>Langue : <?= $v['langue'] ?></p>
                                 </div>
-                                
+
                                 <div class="border-t border-gray-100 pt-4 mt-auto">
                                     <div class="flex items-center justify-between text-sm text-gray-600 mb-4">
-                                        <span class="flex items-center gap-2"><i class="fa-solid fa-user-group text-maroc-green"></i> <?= $v['capacite_max'] ?> places max</span>
+                                        <span class="flex items-center gap-2"><i
+                                                class="fa-solid fa-user-group text-maroc-green"></i> <?= $v['capacite_max'] ?>
+                                            places max</span>
                                     </div>
-                                    
+
                                     <form method="POST" action="" class="flex gap-2">
                                         <input type="hidden" name="id_visite" value="<?= $v['id'] ?>">
-                                        <input type="number" name="nb_places" value="1" min="1" max="10" class="w-16 border border-gray-300 rounded text-center font-bold" title="Nombre de personnes">
-                                        <button type="submit" name="btn_reserver" class="flex-grow bg-gray-900 text-white py-3 rounded-lg font-bold hover:bg-maroc-red transition shadow-lg">
+                                        <input type="number" name="nb_places" value="1" min="1" max="10"
+                                            class="w-16 border border-gray-300 rounded text-center font-bold"
+                                            title="Nombre de personnes">
+                                        <button type="submit" name="btn_reserver"
+                                            class="flex-grow bg-gray-900 text-white py-3 rounded-lg font-bold hover:bg-maroc-red transition shadow-lg">
                                             Réserver
                                         </button>
                                     </form>
@@ -270,15 +299,16 @@ $historique = $stmt_hist->fetchAll();
                 <h2 class="font-headings text-3xl font-extrabold text-gray-900 mt-2">Mon Historique & Avis</h2>
             </div>
 
-            <?php if(empty($historique)): ?>
+            <?php if (empty($historique)): ?>
                 <div class="bg-gray-50 p-8 rounded-xl border border-gray-200 text-center max-w-2xl mx-auto">
                     <i class="fa-solid fa-clock-rotate-left text-4xl text-gray-300 mb-4"></i>
                     <p class="text-gray-500">Vous n'avez pas encore effectué de visite terminée.</p>
                 </div>
             <?php else: ?>
                 <div class="space-y-6 max-w-4xl mx-auto">
-                    <?php foreach($historique as $h): ?>
-                        <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-6 flex flex-col md:flex-row gap-6 hover:shadow-xl transition">
+                    <?php foreach ($historique as $h): ?>
+                        <div
+                            class="bg-white rounded-xl shadow-lg border border-gray-100 p-6 flex flex-col md:flex-row gap-6 hover:shadow-xl transition">
                             <div class="md:w-1/3 border-r border-gray-100 pr-6">
                                 <h3 class="font-headings font-bold text-xl text-gray-800 mb-2"><?= $h['titre'] ?></h3>
                                 <p class="text-sm text-gray-500 mb-2">
@@ -294,16 +324,25 @@ $historique = $stmt_hist->fetchAll();
                                 <h4 class="font-bold text-sm text-gray-400 uppercase mb-3">Laisser un avis</h4>
                                 <form method="POST" action="">
                                     <input type="hidden" name="id_visite_comment" value="<?= $h['id'] ?>">
-                                    
+
                                     <div class="flex gap-4 mb-4">
-                                        <label class="cursor-pointer text-sm font-bold flex items-center bg-gray-50 px-3 py-2 rounded border hover:border-yellow-400"><input type="radio" name="note" value="5" class="mr-2" checked>⭐⭐⭐⭐⭐</label>
-                                        <label class="cursor-pointer text-sm font-bold flex items-center bg-gray-50 px-3 py-2 rounded border hover:border-yellow-400"><input type="radio" name="note" value="4" class="mr-2">⭐⭐⭐⭐</label>
-                                        <label class="cursor-pointer text-sm font-bold flex items-center bg-gray-50 px-3 py-2 rounded border hover:border-yellow-400"><input type="radio" name="note" value="3" class="mr-2">⭐⭐⭐</label>
+                                        <label
+                                            class="cursor-pointer text-sm font-bold flex items-center bg-gray-50 px-3 py-2 rounded border hover:border-yellow-400"><input
+                                                type="radio" name="note" value="5" class="mr-2" checked>⭐⭐⭐⭐⭐</label>
+                                        <label
+                                            class="cursor-pointer text-sm font-bold flex items-center bg-gray-50 px-3 py-2 rounded border hover:border-yellow-400"><input
+                                                type="radio" name="note" value="4" class="mr-2">⭐⭐⭐⭐</label>
+                                        <label
+                                            class="cursor-pointer text-sm font-bold flex items-center bg-gray-50 px-3 py-2 rounded border hover:border-yellow-400"><input
+                                                type="radio" name="note" value="3" class="mr-2">⭐⭐⭐</label>
                                     </div>
 
                                     <div class="flex gap-2">
-                                        <input type="text" name="commentaire" class="flex-grow border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-maroc-green focus:outline-none" placeholder="C'était comment ? (Optionnel)">
-                                        <button type="submit" name="btn_commenter" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-6 rounded-lg text-sm transition shadow-md">
+                                        <input type="text" name="commentaire"
+                                            class="flex-grow border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-maroc-green focus:outline-none"
+                                            placeholder="C'était comment ? (Optionnel)">
+                                        <button type="submit" name="btn_commenter"
+                                            class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-6 rounded-lg text-sm transition shadow-md">
                                             Envoyer
                                         </button>
                                     </div>
@@ -345,6 +384,11 @@ $historique = $stmt_hist->fetchAll();
             </div>
         </div>
     </footer>
-
+    <!-- Notifications d'erreur ou de succes -->
+    <div class="notification success hidden fixed top-6 left-1/2 transform -translate-x-1/2 z-[999] bg-green-500 text-white px-10 py-4 rounded-full shadow-2xl border-4 border-white/30 text-lg font-bold text-center min-w-[350px] shadow-green-500/50"
+        id="success_notification"></div>
+    <div class="notification error hidden fixed top-6 left-1/2 transform -translate-x-1/2 z-[999] bg-red-500 text-white px-10 py-4 rounded-full shadow-2xl border-4 border-white/30 text-lg font-bold text-center min-w-[350px] shadow-green-500/50"
+        id="error_notification"></div>
 </body>
+
 </html>

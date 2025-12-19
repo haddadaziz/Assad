@@ -4,13 +4,11 @@ require_once 'config.php';
 $message = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // nettoyer les données
     $nom = htmlspecialchars($_POST['nom']);
     $email = htmlspecialchars($_POST['email']);
     $password = $_POST['password'];
     $role = $_POST['role'];
 
-    // Vérifier si l'email existe déjà
     $check = $pdo->prepare("SELECT id_utilisateur FROM utilisateurs WHERE email = ?");
     $check->execute([$email]);
 
@@ -18,12 +16,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $message = "<div class='bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4'>Cet email est déjà utilisé.</div>";
     } else {
         $password_hash = password_hash($password, PASSWORD_BCRYPT);
-
-        // ... récupération des variables $nom, $email, $role ...
-
-        // LOGIQUE DU STATUT :
-// Si c'est un GUIDE, statut = 0 (En attente).
-// Si c'est un VISITEUR, statut = 1 (Actif direct).
         $statut = ($role === 'guide') ? 0 : 1;
 
         $sql = "INSERT INTO utilisateurs (nom, email, motpasse_hash, role, statut) VALUES (?, ?, ?, ?, ?)";
@@ -31,9 +23,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if ($stmt->execute([$nom, $email, $password_hash, $role, $statut])) {
             if ($role === 'guide') {
-                header("Location: login.php?pending=1");
+                header("Location: login.php?status=pending_registration");
             } else {
-                header("Location: login.php?success=1");
+                header("Location: login.php?status=success_registration");
             }
             exit();
         } else {
@@ -50,6 +42,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <title>Inscription - Zoo Assad</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="script.js" defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <script>
         tailwind.config = { theme: { extend: { colors: { 'maroc-red': '#C1272D', 'maroc-green': '#006233' } } } }
@@ -111,6 +104,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </p>
         </div>
     </div>
+    <!-- Notifications d'erreur ou de succes -->
+    <div class="notification success hidden fixed top-6 left-1/2 transform -translate-x-1/2 z-[999] bg-green-500 text-white px-10 py-4 rounded-full shadow-2xl border-4 border-white/30 text-lg font-bold text-center min-w-[350px] shadow-green-500/50"
+        id="success_notification"></div>
+    <div class="notification error hidden fixed top-6 left-1/2 transform -translate-x-1/2 z-[999] bg-red-500 text-white px-10 py-4 rounded-full shadow-2xl border-4 border-white/30 text-lg font-bold text-center min-w-[350px] shadow-green-500/50"
+        id="error_notification"></div>
 </body>
 
 </html>
