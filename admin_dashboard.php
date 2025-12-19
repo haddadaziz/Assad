@@ -2,6 +2,24 @@
 session_start();
 require_once 'config.php';
 
+$message = "";
+if (isset($_GET['action']) && isset($_GET['id'])) {
+    $id_user = $_GET['id'];
+    $action = $_GET['action'];
+
+    if ($action == 'valider') {
+        $stmt = $pdo->prepare("UPDATE utilisateurs SET statut = 1 WHERE id_utilisateur = ?");
+        $stmt->execute([$id_user]);
+        $message = "<div class='bg-green-100 text-green-700 p-3 rounded mb-4'>✅ Le compte a été validé !</div>";
+    }
+
+    if ($action == 'bannir') {
+        $stmt = $pdo->prepare("UPDATE utilisateurs SET statut = 0 WHERE id_utilisateur = ?");
+        $stmt->execute([$id_user]);
+        $message = "<div class='bg-red-100 text-red-700 p-3 rounded mb-4'>🚫 Le compte a été bloqué.</div>";
+    }
+}
+
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     header("Location: login.php?redirect=admin");
     exit();
@@ -9,23 +27,22 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
 
 $section = isset($_GET['section']) ? $_GET['section'] : 'dashboard';
 
-// Stats fictives pour le dashboard
+$stat_visiteurs_inscrits = "SELECT * FROM utilisateurs WHERE role = visiteur";
 $stats = [
-    'visiteurs' => 1250,
+    'visiteurs' => $pdo->query("SELECT COUNT(*) FROM utilisateurs WHERE role = 'visiteur'")->fetchColumn(),
     'animaux' => 45,
     'visites' => 12,
     'revenus' => 15000
 ];
 
-// Utilisateurs fictifs pour le design de la validation
-$users_list = [
-    ['id' => 1, 'nom' => 'Benali Ahmed', 'email' => 'ahmed@test.com', 'role' => 'guide', 'valide' => 0],
-    ['id' => 2, 'nom' => 'Dupont Marie', 'email' => 'marie@test.com', 'role' => 'visiteur', 'valide' => 1],
-];
+$sql = "SELECT * FROM utilisateurs";
+$users_list = $pdo->query($sql);
+
 ?>
 
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -49,6 +66,7 @@ $users_list = [
         }
     </script>
 </head>
+
 <body class="bg-gray-100 font-sans flex h-screen overflow-hidden">
 
     <aside class="w-64 bg-gray-900 text-white flex flex-col shadow-2xl">
@@ -62,23 +80,26 @@ $users_list = [
         <nav class="flex-1 overflow-y-auto py-6">
             <ul class="space-y-2">
                 <li>
-                    <a href="?section=dashboard" class="flex items-center px-6 py-3 hover:bg-gray-800 transition border-l-4 <?= $section == 'dashboard' ? 'border-maroc-red bg-gray-800' : 'border-transparent' ?>">
+                    <a href="?section=dashboard"
+                        class="flex items-center px-6 py-3 hover:bg-gray-800 transition border-l-4 <?= $section == 'dashboard' ? 'border-maroc-red bg-gray-800' : 'border-transparent' ?>">
                         <i class="fa-solid fa-chart-line w-6"></i>
                         <span class="font-medium">Vue d'ensemble</span>
                     </a>
                 </li>
-                
+
                 <li class="px-6 py-2 text-xs font-bold text-gray-500 uppercase mt-4">Gestion Contenu</li>
-                
+
                 <li>
-                    <a href="?section=animaux" class="flex items-center px-6 py-3 hover:bg-gray-800 transition border-l-4 <?= $section == 'animaux' ? 'border-maroc-red bg-gray-800' : 'border-transparent' ?>">
+                    <a href="?section=animaux"
+                        class="flex items-center px-6 py-3 hover:bg-gray-800 transition border-l-4 <?= $section == 'animaux' ? 'border-maroc-red bg-gray-800' : 'border-transparent' ?>">
                         <i class="fa-solid fa-paw w-6"></i>
                         <span class="font-medium">Animaux</span>
                     </a>
                 </li>
 
                 <li>
-                    <a href="?section=habitats" class="flex items-center px-6 py-3 hover:bg-gray-800 transition border-l-4 <?= $section == 'habitats' ? 'border-maroc-red bg-gray-800' : 'border-transparent' ?>">
+                    <a href="?section=habitats"
+                        class="flex items-center px-6 py-3 hover:bg-gray-800 transition border-l-4 <?= $section == 'habitats' ? 'border-maroc-red bg-gray-800' : 'border-transparent' ?>">
                         <i class="fa-solid fa-mountain-sun w-6"></i>
                         <span class="font-medium">Habitats</span>
                     </a>
@@ -87,7 +108,8 @@ $users_list = [
                 <li class="px-6 py-2 text-xs font-bold text-gray-500 uppercase mt-4">Utilisateurs</li>
 
                 <li>
-                    <a href="?section=utilisateurs" class="flex items-center px-6 py-3 hover:bg-gray-800 transition border-l-4 <?= $section == 'utilisateurs' ? 'border-maroc-red bg-gray-800' : 'border-transparent' ?>">
+                    <a href="?section=utilisateurs"
+                        class="flex items-center px-6 py-3 hover:bg-gray-800 transition border-l-4 <?= $section == 'utilisateurs' ? 'border-maroc-red bg-gray-800' : 'border-transparent' ?>">
                         <i class="fa-solid fa-users w-6"></i>
                         <span class="font-medium">Comptes & Validations</span>
                         <span class="ml-auto bg-maroc-red text-xs font-bold px-2 py-0.5 rounded-full">1</span>
@@ -105,24 +127,30 @@ $users_list = [
     </aside>
 
     <main class="flex-1 overflow-y-auto bg-gray-100 p-8">
-        
+
         <header class="flex justify-between items-center mb-8">
             <h1 class="text-3xl font-headings font-bold text-gray-800 capitalize">
-                <?php 
-                    if($section == 'dashboard') echo "Tableau de Bord";
-                    elseif($section == 'animaux') echo "Gestion des Animaux";
-                    elseif($section == 'habitats') echo "Gestion des Habitats";
-                    elseif($section == 'utilisateurs') echo "Modération Utilisateurs";
+                <?php
+                if ($section == 'dashboard')
+                    echo "Tableau de Bord";
+                elseif ($section == 'animaux')
+                    echo "Gestion des Animaux";
+                elseif ($section == 'habitats')
+                    echo "Gestion des Habitats";
+                elseif ($section == 'utilisateurs')
+                    echo "Modération Utilisateurs";
                 ?>
             </h1>
-            <a href="index.php" target="_blank" class="bg-white text-gray-700 px-4 py-2 rounded shadow hover:bg-gray-50 flex items-center gap-2 text-sm">
+            <a href="index.php" target="_blank"
+                class="bg-white text-gray-700 px-4 py-2 rounded shadow hover:bg-gray-50 flex items-center gap-2 text-sm">
                 <i class="fa-solid fa-eye"></i> Voir le site
             </a>
         </header>
 
         <?php if ($section == 'dashboard'): ?>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-maroc-red flex items-center justify-between">
+                <div
+                    class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-maroc-red flex items-center justify-between">
                     <div>
                         <p class="text-sm text-gray-500 font-bold uppercase">Visiteurs Inscrits</p>
                         <p class="text-3xl font-bold text-gray-800"><?= $stats['visiteurs'] ?></p>
@@ -131,7 +159,8 @@ $users_list = [
                         <i class="fa-solid fa-users text-xl"></i>
                     </div>
                 </div>
-                <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-maroc-green flex items-center justify-between">
+                <div
+                    class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-maroc-green flex items-center justify-between">
                     <div>
                         <p class="text-sm text-gray-500 font-bold uppercase">Animaux</p>
                         <p class="text-3xl font-bold text-gray-800"><?= $stats['animaux'] ?></p>
@@ -140,7 +169,8 @@ $users_list = [
                         <i class="fa-solid fa-hippo text-xl"></i>
                     </div>
                 </div>
-                 <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-yellow-500 flex items-center justify-between">
+                <div
+                    class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-yellow-500 flex items-center justify-between">
                     <div>
                         <p class="text-sm text-gray-500 font-bold uppercase">Visites Réservées</p>
                         <p class="text-3xl font-bold text-gray-800"><?= $stats['visites'] ?></p>
@@ -160,31 +190,29 @@ $users_list = [
                 </div>
             </div>
 
-            <div class="bg-white p-6 rounded-xl shadow-sm">
-                <h3 class="font-bold text-lg mb-4">Dernières Inscriptions</h3>
-                <p class="text-gray-500 text-sm">Liste à implémenter avec SQL...</p>
-            </div>
-
 
         <?php elseif ($section == 'animaux'): ?>
             <div class="bg-white rounded-xl shadow-md p-6">
                 <div class="mb-8 p-6 bg-gray-50 rounded-lg border border-gray-200">
-                    <h3 class="font-bold text-lg mb-4 text-maroc-green"><i class="fa-solid fa-plus-circle mr-2"></i>Ajouter un nouvel animal</h3>
-                    <form action="" method="POST" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <h3 class="font-bold text-lg mb-4 text-maroc-green"><i class="fa-solid fa-plus-circle mr-2"></i>Ajouter
+                        un nouvel animal</h3>
+                    <form action="" method="POST" enctype="multipart/form-data"
+                        class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <input type="text" placeholder="Nom (ex: Simba)" class="border p-2 rounded w-full">
                         <input type="text" placeholder="Espèce (ex: Lion)" class="border p-2 rounded w-full">
                         <input type="text" placeholder="Pays d'origine" class="border p-2 rounded w-full">
                         <select class="border p-2 rounded w-full">
                             <option>Choisir un habitat...</option>
-                            </select>
+                        </select>
                         <div class="md:col-span-2">
                             <textarea placeholder="Description courte..." class="border p-2 rounded w-full"></textarea>
                         </div>
                         <div class="md:col-span-2">
                             <label class="block text-sm text-gray-500 mb-1">Image de l'animal</label>
-                            <input type="file" class="border p-2 rounded w-full bg-white">
+                            <input type="url" placeholder="https://..." class="border p-2 rounded w-full">
                         </div>
-                        <button class="bg-maroc-green text-white py-2 px-6 rounded font-bold hover:bg-green-800 transition">Enregistrer</button>
+                        <button
+                            class="bg-maroc-green text-white py-2 px-6 rounded font-bold hover:bg-green-800 transition">Enregistrer</button>
                     </form>
                 </div>
 
@@ -200,10 +228,13 @@ $users_list = [
                     </thead>
                     <tbody>
                         <tr class="border-b hover:bg-gray-50">
-                            <td class="p-4"><div class="w-12 h-12 bg-gray-200 rounded-full"></div></td>
+                            <td class="p-4">
+                                <div class="w-12 h-12 bg-gray-200 rounded-full"></div>
+                            </td>
                             <td class="p-4 font-bold">Asaad</td>
                             <td class="p-4">Lion de l'Atlas</td>
-                            <td class="p-4"><span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Montagnes</span></td>
+                            <td class="p-4"><span
+                                    class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Montagnes</span></td>
                             <td class="p-4 text-right space-x-2">
                                 <button class="text-blue-500 hover:text-blue-700"><i class="fa-solid fa-pen"></i></button>
                                 <button class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
@@ -213,6 +244,53 @@ $users_list = [
                 </table>
             </div>
 
+            <!-- habitats (id, nom, typeclimat, description, zonezoo) -->
+        <?php elseif ($section == 'habitats'): ?>
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <div class="mb-8 p-6 bg-gray-50 rounded-lg border border-gray-200">
+                    <h3 class="font-bold text-lg mb-4 text-maroc-green"><i class="fa-solid fa-plus-circle mr-2"></i>Ajouter
+                        un nouvel habitat</h3>
+                    <form action="" method="POST" enctype="multipart/form-data"
+                        class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input type="text" placeholder="Nom (ex : Savane)" class="border p-2 rounded w-full">
+                        <input type="text" placeholder="Type de Climat (ex : humide)" class="border p-2 rounded w-full">
+                        <input type="text" placeholder="Description" class="border p-2 rounded w-full">
+                        <input type="text" placeholder="Zone de l'habitat dans le zoo" class="border p-2 rounded w-full">
+                        <div class="md:col-span-2">
+                            <textarea placeholder="Description courte..." class="border p-2 rounded w-full"></textarea>
+                        </div>
+                        <button
+                            class="bg-maroc-green text-white py-2 px-6 rounded font-bold hover:bg-green-800 transition">Enregistrer</button>
+                    </form>
+                </div>
+
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-100 text-gray-600 uppercase text-xs">
+                            <th class="p-4">Image</th>
+                            <th class="p-4">Nom</th>
+                            <th class="p-4">Espèce</th>
+                            <th class="p-4">Habitat</th>
+                            <th class="p-4 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="p-4">
+                                <div class="w-12 h-12 bg-gray-200 rounded-full"></div>
+                            </td>
+                            <td class="p-4 font-bold">Asaad</td>
+                            <td class="p-4">Lion de l'Atlas</td>
+                            <td class="p-4"><span
+                                    class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Montagnes</span></td>
+                            <td class="p-4 text-right space-x-2">
+                                <button class="text-blue-500 hover:text-blue-700"><i class="fa-solid fa-pen"></i></button>
+                                <button class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
         <?php elseif ($section == 'utilisateurs'): ?>
             <div class="bg-white rounded-xl shadow-md p-6">
@@ -230,33 +308,54 @@ $users_list = [
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach($users_list as $u): ?>
-                        <tr class="border-b hover:bg-gray-50">
-                            <td class="p-4 font-bold"><?= $u['nom'] ?></td>
-                            <td class="p-4 text-gray-500"><?= $u['email'] ?></td>
-                            <td class="p-4">
-                                <span class="uppercase text-xs font-bold tracking-wide <?= $u['role'] == 'guide' ? 'text-purple-600' : 'text-gray-600' ?>">
-                                    <?= $u['role'] ?>
-                                </span>
-                            </td>
-                            <td class="p-4">
-                                <?php if($u['valide']): ?>
-                                    <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">Actif</span>
-                                <?php else: ?>
-                                    <span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-bold animate-pulse">En attente</span>
-                                <?php endif; ?>
-                            </td>
-                            <td class="p-4 text-right space-x-2">
-                                <?php if(!$u['valide']): ?>
-                                    <button class="bg-green-500 text-white px-3 py-1 rounded text-xs hover:bg-green-600 shadow" title="Valider">
-                                        <i class="fa-solid fa-check"></i> Valider
-                                    </button>
-                                <?php endif; ?>
-                                <button class="text-red-500 hover:text-red-700" title="Bannir/Supprimer">
-                                    <i class="fa-solid fa-ban"></i>
-                                </button>
-                            </td>
-                        </tr>
+                        <?php foreach ($users_list as $u): ?>
+                            <tr class="border-b hover:bg-gray-50">
+                                <td class="p-4 font-bold"><?= $u['nom'] ?></td>
+                                <td class="p-4 text-gray-500"><?= $u['email'] ?></td>
+                                <td class="p-4">
+                                    <?php
+                                    $style_role = "bg-gray-100 text-gray-600";
+                                    if ($u['role'] === 'admin') {
+                                        $style_role = "bg-red-100 text-red-700 border border-red-200";
+                                    } elseif ($u['role'] === 'guide') {
+                                        $style_role = "bg-purple-100 text-purple-700";
+                                    }
+                                    ?>
+
+                                    <span
+                                        class="uppercase text-xs font-bold tracking-wide px-2 py-1 rounded <?= $style_role ?>">
+                                        <?= $u['role'] ?>
+                                    </span>
+                                </td>
+                                <td class="p-4">
+                                    <?php if ($u['statut'] == 1): ?>
+                                        <span
+                                            class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">Actif</span>
+                                    <?php else: ?>
+                                        <span
+                                            class="bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold animate-pulse">Inactif</span>
+                                    <?php endif; ?>
+                                </td>
+
+                                <td class="p-4 text-right space-x-2">
+                                    <?php if ($u['role'] != 'admin'): ?>
+
+                                        <?php if ($u['statut'] == 0): ?>
+                                            <a href="?section=utilisateurs&action=valider&id=<?= $u['id_utilisateur'] ?>"
+                                                class="bg-green-500 text-white px-3 py-1 rounded text-xs hover:bg-green-600 shadow inline-block">
+                                                <i class="fa-solid fa-check"></i> Activer
+                                            </a>
+                                        <?php endif; ?>
+
+                                        <a href="?section=utilisateurs&action=bannir&id=<?= $u['id_utilisateur'] ?>"
+                                            class="text-red-500 hover:text-red-700 border border-red-200 px-2 py-1 rounded hover:bg-red-50 inline-block"
+                                            title="Bloquer">
+                                            <i class="fa-solid fa-ban"></i>
+                                        </a>
+
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
@@ -275,4 +374,5 @@ $users_list = [
     </main>
 
 </body>
+
 </html>
