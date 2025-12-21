@@ -9,13 +9,13 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
     if ($action == 'valider') {
         $stmt = $pdo->prepare("UPDATE utilisateurs SET statut = 1 WHERE id_utilisateur = ?");
         $stmt->execute([$id_user]);
-        header("Location: ?section=habitats&status=success_compte_valider");
+        header("Location: ?section=utilisateurs&status=success_compte_valider");
     }
 
     if ($action == 'bannir') {
         $stmt = $pdo->prepare("UPDATE utilisateurs SET statut = 0 WHERE id_utilisateur = ?");
         $stmt->execute([$id_user]);
-        header("Location: ?section=habitats&status=success_block_user");
+        header("Location: ?section=utilisateurs&status=success_block_user");
     }
 }
 
@@ -53,7 +53,7 @@ $stats = [
     'visiteurs' => $pdo->query("SELECT COUNT(*) FROM utilisateurs WHERE role = 'visiteur'")->fetchColumn(),
     'animaux' => 45,
     'visites' => 12,
-    'revenus' => 15000
+    'habitats' => 15000
 ];
 
 $sql = "SELECT * FROM utilisateurs";
@@ -162,7 +162,7 @@ $animaux_list = $pdo->query("SELECT * FROM animaux")->fetchAll();
                 elseif ($section == 'habitats')
                     echo "Gestion des Habitats";
                 elseif ($section == 'utilisateurs')
-                    echo "Modération Utilisateurs";
+                    echo "Gestion Des Utilisateurs";
                 ?>
             </h1>
             <a href="index.php" target="_blank"

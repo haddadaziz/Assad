@@ -9,27 +9,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'guide') {
 
 $id_guide = $_SESSION['user_id'];
 
-if (isset($_POST['creer_visite'])) {
-    $titre = htmlspecialchars($_POST['titre']);
-    $date = $_POST['dateheure'];
-    $langue = $_POST['langue'];
-    $duree = $_POST['duree'];
-    $prix = $_POST['prix'];
-    $capacite = $_POST['capacite'];
-
-    // On insère la visite liée à CE guide ($id_guide)
-    $sql = "INSERT INTO visitesguidees (titre, dateheure, langue, duree, prix, capacite_max, id_guide, est_active) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, 1)";
-    $stmt = $pdo->prepare($sql);
-
-    if ($stmt->execute([$titre, $date, $langue, $duree, $prix, $capacite, $id_guide])) {
-        header("Location: ?section=mes_visites&status=success_creation_visite");
-    } else {
-        header("Location: ?section=mes_visites&status=erreur_creation_visite");
-    }
-}
-
-// Gestion de la section (Navigation)
+// gerer la section a afficher
 $section = isset($_GET['section']) ? $_GET['section'] : 'mes_visites';
 
 ?>
@@ -170,14 +150,6 @@ $section = isset($_GET['section']) ? $_GET['section'] : 'mes_visites';
 
                 <div class="lg:col-span-2 space-y-4">
                     <h2 class="font-bold text-lg text-gray-700">Vos visites programmées</h2>
-
-                    <?php
-                    $sql_visites = "SELECT * FROM visitesguidees WHERE id_guide = ? ORDER BY dateheure DESC";
-                    $stmt_v = $pdo->prepare($sql_visites);
-                    $stmt_v->execute([$id_guide]);
-                    $mes_visites = $stmt_v->fetchAll();
-                    ?>
-
                     <?php if (empty($mes_visites)): ?>
                         <div class="bg-white p-8 rounded-xl shadow text-center text-gray-500">
                             <i class="fa-regular fa-calendar-xmark text-4xl mb-3"></i>
@@ -230,20 +202,6 @@ $section = isset($_GET['section']) ? $_GET['section'] : 'mes_visites';
             </div>
 
         <?php elseif ($section == 'reservations'): ?>
-            <?php
-            // Requête complexe : Récupérer les réservations pour les visites de CE guide
-            // JOIN entre reservations, visites et utilisateurs (visiteurs)
-            $sql_res = "SELECT r.*, v.titre, v.dateheure, u.nom AS nom_visiteur, u.email 
-                        FROM reservations r
-                        JOIN visitesguidees v ON r.idvisite = v.id
-                        JOIN utilisateurs u ON r.idutilisateur = u.id
-                        WHERE v.id_guide = ?
-                        ORDER BY r.datereservation DESC";
-            $stmt_r = $pdo->prepare($sql_res);
-            $stmt_r->execute([$id_guide]);
-            $reservations = $stmt_r->fetchAll();
-            ?>
-
             <div class="bg-white rounded-xl shadow-md overflow-hidden">
                 <table class="w-full text-left">
                     <thead class="bg-gray-100 text-gray-600 uppercase text-xs">
@@ -256,25 +214,9 @@ $section = isset($_GET['section']) ? $_GET['section'] : 'mes_visites';
                         </tr>
                     </thead>
                     <tbody class="text-sm">
-                        <?php foreach ($reservations as $r): ?>
-                            <tr class="border-b hover:bg-gray-50">
-                                <td class="p-4 font-bold"><?= $r['nom_visiteur'] ?></td>
-                                <td class="p-4"><?= $r['titre'] ?></td>
-                                <td class="p-4 text-gray-500"><?= date('d/m/Y à H:i', strtotime($r['dateheure'])) ?></td>
-                                <td class="p-4 text-center">
-                                    <span class="bg-gray-100 px-2 py-1 rounded font-bold"><?= $r['nbpersonnes'] ?></span>
-                                </td>
-                                <td class="p-4 text-blue-600 hover:underline">
-                                    <a href="mailto:<?= $r['email'] ?>"><?= $r['email'] ?></a>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-
-                        <?php if (empty($reservations)): ?>
                             <tr>
                                 <td colspan="5" class="p-8 text-center text-gray-500">Aucune réservation pour le moment.</td>
                             </tr>
-                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>

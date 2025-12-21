@@ -2,58 +2,13 @@
 session_start();
 require_once 'config.php';
 
-// 1. SÉCURITÉ : Vérifier si c'est un visiteur connecté
+// verifier s'il est connecté
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'visiteur') {
     header("Location: login.php?redirect=visiteur");
     exit();
 }
 
 $id_user = $_SESSION['user_id'];
-$message = "";
-
-// --- LOGIQUE : RÉSERVER UNE VISITE ---
-if (isset($_POST['btn_reserver'])) {
-    $id_visite_form = $_POST['id_visite'];
-    $nb_places = $_POST['nb_places'];
-
-    $sql_resa = "INSERT INTO reservations (idvisite, idutilisateur, nbpersonnes) VALUES (?, ?, ?)";
-    $stmt = $pdo->prepare($sql_resa);
-    if ($stmt->execute([$id_visite_form, $id_user, $nb_places])) {
-        $message = "<div class='fixed top-24 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-xl z-50 animate-bounce'><i class='fa-solid fa-check-circle mr-2'></i> Réservation confirmée !</div>";
-    } else {
-        $message = "<div class='fixed top-24 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-xl z-50'><i class='fa-solid fa-triangle-exclamation mr-2'></i> Erreur technique.</div>";
-    }
-}
-
-// --- LOGIQUE : LAISSER UN COMMENTAIRE ---
-if (isset($_POST['btn_commenter'])) {
-    $id_visite_comment = $_POST['id_visite_comment'];
-    $note = $_POST['note'];
-    $texte = htmlspecialchars($_POST['commentaire']);
-
-    $sql_com = "INSERT INTO commentaires (idvisitesguides, idutilisateur, note, texte) VALUES (?, ?, ?, ?)";
-    $stmt = $pdo->prepare($sql_com);
-    if ($stmt->execute([$id_visite_comment, $id_user, $note, $texte])) {
-        $message = "<div class='fixed top-24 right-4 bg-blue-500 text-white px-6 py-3 rounded-lg shadow-xl z-50'><i class='fa-solid fa-comment-dots mr-2'></i> Merci pour votre avis !</div>";
-    }
-}
-
-// --- RÉCUPÉRATION DES DONNÉES ---
-
-// 1. Visites FUTURES (Pour la section Visites existante)
-// On sélectionne les visites actives et futures
-$sql_futures = "SELECT * FROM visitesguidees WHERE dateheure > NOW() AND statut = 1 ORDER BY dateheure ASC";
-$visites_futures = $pdo->query($sql_futures)->fetchAll();
-
-// 2. Visites PASSÉES (Pour la nouvelle section Historique)
-$sql_passees = "SELECT v.*, r.nbpersonnes 
-                FROM reservations r
-                JOIN visitesguidees v ON r.idvisite = v.id_visite
-                WHERE r.idutilisateur = ? AND v.dateheure < NOW()
-                ORDER BY v.dateheure DESC";
-$stmt_hist = $pdo->prepare($sql_passees);
-$stmt_hist->execute([$id_user]);
-$historique = $stmt_hist->fetchAll();
 ?>
 
 <!DOCTYPE html>
